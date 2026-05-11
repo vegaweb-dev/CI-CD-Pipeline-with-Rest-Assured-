@@ -1,0 +1,54 @@
+name: API Automation Pipeline
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  schedule:
+    - cron: '0 2 * * *' # Ejecución automática todas las noches a las 2 AM (UTC)
+
+permissions:
+  contents: write
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Código Fuente
+        uses: actions/checkout@v4
+
+      - name: Configurar Entorno Java 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21' # Sincronizado con tu pom.xml para evitar fallos de compilación
+          cache: 'maven'
+
+      - name: Ejecutar Pruebas de API
+        run: mvn clean test
+        continue-on-error: true # Excelente: Permite generar el reporte aunque fallen los tests
+
+      - name: Obtener Historial de Allure
+        uses: actions/checkout@v4
+        if: always()
+        with:
+          ref: gh-pages
+          path: allure-history # Corregido: Coincide exactamente con la carpeta que requiere la acción de Allure
+
+      - name: Generar Reporte de Allure (Documentación Viva)
+        uses: simple-elf/allure-report-action@v1 # Corregido: Versión fija y segura en lugar de @master
+        if: always()
+        with:
+          allure_results: target/allure-results # Corregido: Maven Surefire guarda los resultados por defecto dentro de 'target/'
+          allure_history: allure-history
+          keep_reports: 20
+
+      - name: Desplegar Reporte en GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        if: always()
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: allure-history
+          publish_branch: gh-pages
