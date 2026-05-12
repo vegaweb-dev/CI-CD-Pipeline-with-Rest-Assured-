@@ -42,12 +42,13 @@ jobs:
           path: allure-history
 
       - name: Generar Reporte de Allure (Documentación Viva)
-        uses: io-mhmd/allure-report-action@v2 # Cambiado a v2 nativo en JS: Soluciona el error de Docker
+        uses: simple-elf/allure-report-action@v1.9.7
         if: always()
         with:
           allure_results: target/allure-results
           allure_history: allure-history
-          keep_reports: 20 # Ahora este parámetro sí es totalmente válido y soportado aquí
+          keep_reports: 20
+
 
       - name: Desplegar Reporte en GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
