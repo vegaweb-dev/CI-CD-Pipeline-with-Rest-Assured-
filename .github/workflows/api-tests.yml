@@ -39,13 +39,20 @@ jobs:
         if: always()
         with:
           ref: gh-pages
-          path: gh-pages
+          path: allure-history
 
-      - name: Generar Reporte de Allure y Desplegar
+      - name: Generar Reporte de Allure (Documentación Viva)
         uses: simple-elf/allure-report-action@master
         if: always()
         with:
           allure_results: target/allure-results
           allure_history: allure-history
           keep_reports: 20
-          gh_pages: gh-pages
+
+      - name: Desplegar Reporte en GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        if: always()
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: allure-history
+          publish_branch: gh-pages
