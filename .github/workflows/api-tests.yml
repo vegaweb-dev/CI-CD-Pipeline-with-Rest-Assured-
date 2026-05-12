@@ -42,7 +42,7 @@ jobs:
           path: gh-pages
 
       - name: Generar Reporte de Allure (Documentación Viva)
-        uses: simple-elf/allure-report-action@v1.9.7
+        uses: simple-elf/allure-report-action@1.9.7
         if: always()
         with:
           allure_results: target/allure-results
